@@ -1,11 +1,12 @@
-import { View, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard } from 'react-native';
-import { phoneStepStyles } from '@/styles/phoneStep';
-import { useCallback, useRef, useState } from 'react';
+import { View, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard, AccessibilityInfo } from 'react-native';
+import { otpStepStyles } from '@/styles/otpStep';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Phone, MessageCircle, ChevronLeft, X } from 'lucide-react-native';
+import { MessageCircle, ChevronLeft, X } from 'lucide-react-native';
 import { useAuth } from '@/hooks/useAuth';
 import { useTranslation } from '@/utils/i18n';
+import { formatPhoneNumber } from '@/utils/validation';
 import { AnimatedButton } from '@/components/AnimatedButton';
 import { AnimatedInput } from '@/components/AnimatedInput';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -28,11 +29,11 @@ const NumericKeypad: React.FC<NumericKeypadProps> = ({ onKeyPress, onDelete, onC
       key={value}
     >
       <TouchableOpacity 
-        style={phoneStepStyles.keypadKey} 
+        style={otpStepStyles.keypadKey} 
         onPress={() => onKeyPress(value.toString())}
         accessibilityLabel={`Touche ${value}`}
       >
-        <Text style={phoneStepStyles.keypadKeyText}>{value}</Text>
+        <Text style={otpStepStyles.keypadKeyText}>{value}</Text>
       </TouchableOpacity>
     </Animatable.View>
   );
@@ -42,23 +43,23 @@ const NumericKeypad: React.FC<NumericKeypadProps> = ({ onKeyPress, onDelete, onC
       animation="fadeInUp" 
       duration={800} 
       delay={300}
-      style={phoneStepStyles.keypadContainer}
+      style={otpStepStyles.keypadContainer}
     >
-      <View style={phoneStepStyles.keypadRow}>
+      <View style={otpStepStyles.keypadRow}>
         {[1, 2, 3].map(renderKey)}
       </View>
-      <View style={phoneStepStyles.keypadRow}>
+      <View style={otpStepStyles.keypadRow}>
         {[4, 5, 6].map(renderKey)}
       </View>
-      <View style={phoneStepStyles.keypadRow}>
+      <View style={otpStepStyles.keypadRow}>
         {[7, 8, 9].map(renderKey)}
       </View>
-      <View style={phoneStepStyles.keypadRow}>
-        <TouchableOpacity style={[phoneStepStyles.keypadKey, phoneStepStyles.keypadSpecialKey]} onPress={onClear}>
+      <View style={otpStepStyles.keypadRow}>
+        <TouchableOpacity style={[otpStepStyles.keypadKey, otpStepStyles.keypadSpecialKey]} onPress={onClear}>
           <X size={20} color="#6B7280" />
         </TouchableOpacity>
         {renderKey(0)}
-        <TouchableOpacity style={[phoneStepStyles.keypadKey, phoneStepStyles.keypadSpecialKey]} onPress={onDelete}>
+        <TouchableOpacity style={[otpStepStyles.keypadKey, otpStepStyles.keypadSpecialKey]} onPress={onDelete}>
           <ChevronLeft size={20} color="#6B7280" />
         </TouchableOpacity>
       </View>
@@ -66,49 +67,51 @@ const NumericKeypad: React.FC<NumericKeypadProps> = ({ onKeyPress, onDelete, onC
   );
 };
 
-export default function Index() {
+export default function OtpScreen() {
   const {
     phone,
+    otp,
     loading,
     error,
-    setPhone,
-    sendOTP
+    setOtp,
+    verifyOTP,
+    resetToPhoneStep
   } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
   const [showKeypad, setShowKeypad] = useState(false);
   const inputRef = useRef<any>(null);
 
-  // Gérer la soumission du numéro de téléphone
-  const handleSendOTP = useCallback(async () => {
+  // Gérer la vérification du code OTP
+  const handleVerifyOTP = useCallback(async () => {
     Keyboard.dismiss();
-    const success = await sendOTP();
+    const success = await verifyOTP();
     if (success) {
-      // Rediriger vers la page OTP
-      router.push('/otp');
+      router.replace('/(tabs)');
     }
-  }, [sendOTP, router]);
+  }, [verifyOTP, router]);
 
-  // Formater le numéro de téléphone pour l'affichage
-  const handlePhoneChange = useCallback((value: string) => {
-    setPhone(value);
-  }, [setPhone]);
-  
+  // Gérer le retour à l'étape du numéro de téléphone
+  const handleBackToPhone = useCallback(() => {
+    resetToPhoneStep();
+    router.back();
+  }, [resetToPhoneStep, router]);
+
   // Gérer l'appui sur une touche du clavier numérique
   const handleKeyPress = useCallback((key: string) => {
-    const newPhone = phone.length >= 12 ? phone : phone + key;
-    setPhone(newPhone);
-  }, [setPhone, phone]);
+    const newOtp = otp.length >= 4 ? otp : otp + key;
+    setOtp(newOtp);
+  }, [setOtp, otp]);
 
   // Gérer la suppression d'un caractère
   const handleDelete = useCallback(() => {
-    setPhone(phone.slice(0, -1));
-  }, [setPhone, phone]);
+    setOtp(otp.slice(0, -1));
+  }, [setOtp, otp]);
 
   // Effacer tout le texte
   const handleClear = useCallback(() => {
-    setPhone('');
-  }, [setPhone]);
+    setOtp('');
+  }, [setOtp]);
 
   // Basculer l'affichage du clavier numérique
   const toggleKeypad = useCallback(() => {
@@ -122,14 +125,28 @@ export default function Index() {
     setShowKeypad(prev => !prev);
   }, [showKeypad]);
 
+  // Effet pour annoncer les erreurs aux lecteurs d'écran
+  useEffect(() => {
+    if (error) {
+      AccessibilityInfo.announceForAccessibility(error);
+    }
+  }, [error]);
+
+  // Effet pour masquer le clavier système quand le clavier personnalisé est affiché
+  useEffect(() => {
+    if (showKeypad) {
+      Keyboard.dismiss();
+    }
+  }, [showKeypad]);
+
   return (
-    <SafeAreaView style={phoneStepStyles.container}>
+    <SafeAreaView style={otpStepStyles.container}>
       <LinearGradient
         colors={['#FFFFFF', '#FFF7ED']}
-        style={phoneStepStyles.gradient}
+        style={otpStepStyles.gradient}
       >
         <KeyboardAvoidingView
-          style={phoneStepStyles.content}
+          style={otpStepStyles.content}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
         >
@@ -137,13 +154,13 @@ export default function Index() {
             animation="fadeIn" 
             duration={1000} 
             delay={300}
-            style={phoneStepStyles.header}
+            style={otpStepStyles.header}
           >
             <Animatable.Text 
               animation="bounceIn" 
               duration={1500} 
               delay={500}
-              style={phoneStepStyles.logo} 
+              style={otpStepStyles.logo} 
               accessibilityRole="image"
             >
               🏪
@@ -152,7 +169,7 @@ export default function Index() {
               animation="fadeInDown" 
               duration={800} 
               delay={800}
-              style={phoneStepStyles.title} 
+              style={otpStepStyles.title} 
               accessibilityRole="header"
             >
               {t('auth.login.title')}
@@ -161,54 +178,70 @@ export default function Index() {
               animation="fadeIn" 
               duration={800} 
               delay={1000}
-              style={phoneStepStyles.subtitle}
+              style={otpStepStyles.subtitle}
             >
               {t('auth.login.subtitle')}
             </Animatable.Text>
           </Animatable.View>
 
-          <View style={phoneStepStyles.form}>
+          <View style={otpStepStyles.form}>
             <Animatable.View 
-              animation="fadeInUp" 
-              duration={800} 
-              delay={1200}
+              animation="fadeInRight" 
+              duration={800}
             >
-              <View style={phoneStepStyles.inputContainer}>
+              <Text style={otpStepStyles.stepTitle}>{t('auth.verification.title')}</Text>
+              <Text style={otpStepStyles.stepSubtitle}>
+                {t('auth.verification.subtitle', { phone: formatPhoneNumber(phone) })}
+              </Text>
+              
+              <View style={otpStepStyles.inputContainer}>
                 <AnimatedInput
-                  label={t('auth.phone.label')}
-                  value={phone}
-                  onChangeText={handlePhoneChange}
-                  placeholder={t('auth.phone.placeholder')}
-                  keyboardType="phone-pad"
+                  label={t('auth.otp.label')}
+                  value={otp}
+                  onChangeText={setOtp}
+                  placeholder={t('auth.otp.placeholder')}
+                  keyboardType="numeric"
+                  maxLength={4}
                   autoFocus={!showKeypad}
-                  accessibilityLabel={t('auth.phone.label')}
-                  accessibilityHint={t('auth.login.subtitle')}
-                  icon={<Phone size={20} color="#6B7280" />}
+                  textAlign="center"
+                  accessibilityLabel={t('auth.otp.label')}
+                  accessibilityHint={t('auth.verification.subtitle', { phone: formatPhoneNumber(phone) })}
                   error={error}
+                  inputStyle={otpStepStyles.otpInputStyle}
                   ref={inputRef}
                   onFocus={() => setShowKeypad(false)}
                 />
                 
                 <TouchableOpacity 
-                  style={phoneStepStyles.keypadToggle}
+                  style={otpStepStyles.keypadToggle}
                   onPress={toggleKeypad}
                   accessibilityLabel={showKeypad ? "Masquer le clavier" : "Afficher le clavier"}
                 >
-                  <Text style={phoneStepStyles.keypadToggleText}>
+                  <Text style={otpStepStyles.keypadToggleText}>
                     {showKeypad ? "Masquer le clavier" : "Utiliser le clavier numérique"}
                   </Text>
                 </TouchableOpacity>
               </View>
 
               <AnimatedButton
-                onPress={handleSendOTP}
-                disabled={loading || !phone.trim()}
+                onPress={handleVerifyOTP}
+                disabled={loading || !otp.trim() || otp.length < 4}
                 loading={loading}
-                text={loading ? t('auth.button.sending') : t('auth.button.send')}
-                icon={<MessageCircle size={20} color="#FFFFFF" />}
+                text={loading ? t('auth.button.verifying') : t('auth.button.verify')}
                 gradientColors={['#FF8C00', '#FF6347']}
-                accessibilityLabel={loading ? t('auth.button.sending') : t('auth.button.send')}
+                accessibilityLabel={loading ? t('auth.button.verifying') : t('auth.button.verify')}
               />
+
+              <Animatable.View animation="fadeIn" delay={300}>
+                <AnimatedButton
+                  onPress={handleBackToPhone}
+                  text={t('auth.button.change_number')}
+                  gradientColors={['transparent', 'transparent']}
+                  textStyle={otpStepStyles.backButtonText}
+                  style={otpStepStyles.backButton}
+                  accessibilityLabel={t('auth.button.change_number')}
+                />
+              </Animatable.View>
             </Animatable.View>
           </View>
 
@@ -224,9 +257,9 @@ export default function Index() {
             animation="fadeIn" 
             duration={800} 
             delay={1500}
-            style={phoneStepStyles.footer}
+            style={otpStepStyles.footer}
           >
-            <Text style={phoneStepStyles.footerText}>
+            <Text style={otpStepStyles.footerText}>
               {t('footer.terms')}
             </Text>
           </Animatable.View>
