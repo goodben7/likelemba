@@ -1,4 +1,4 @@
-import { View, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard } from 'react-native';
+import { View, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard, Image } from 'react-native';
 import { phoneStepStyles } from '@/styles/phoneStep';
 import { useCallback, useRef, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -69,7 +69,12 @@ export default function Index() {
               style={phoneStepStyles.logo} 
               accessibilityRole="image"
             >
-              🏪
+              <Image 
+                source={require('@/assets/images/logo.png')} 
+                style={{ width: 80, height: 80 }}
+                resizeMode="contain"
+                accessibilityLabel="Logo de l'application"
+              />
             </Animatable.Text>
             <Animatable.Text 
               animation="fadeInDown" 

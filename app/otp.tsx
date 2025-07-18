@@ -1,4 +1,4 @@
-import { View, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard, AccessibilityInfo } from 'react-native';
+import { View, Text, KeyboardAvoidingView, Platform, TouchableOpacity, Keyboard, AccessibilityInfo, Image } from 'react-native';
 import { otpStepStyles } from '@/styles/otpStep';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -77,7 +77,12 @@ export default function OtpScreen() {
               style={otpStepStyles.logo} 
               accessibilityRole="image"
             >
-              🏪
+              <Image 
+                source={require('@/assets/images/logo.png')} 
+                style={{ width: 80, height: 80 }}
+                resizeMode="contain"
+                accessibilityLabel="Logo de l'application"
+              />
             </Animatable.Text>
             <Animatable.Text 
               animation="fadeInDown" 
