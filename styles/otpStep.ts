@@ -16,8 +16,8 @@ export const otpStepStyles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    paddingTop: 60,
-    paddingBottom: 40,
+    paddingTop: 40,
+    paddingBottom: 10,
   },
   logo: {
     fontSize: 64,
@@ -30,7 +30,7 @@ export const otpStepStyles = StyleSheet.create({
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 1,
     color: '#6B7280',
     textAlign: 'center',
   },
@@ -57,17 +57,25 @@ export const otpStepStyles = StyleSheet.create({
     alignSelf: 'center',
   },
   otpInputStyle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     letterSpacing: 8,
     textAlign: 'center',
   },
   backButton: {
     marginTop: 16,
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
   },
   backButtonText: {
-    color: '#6B7280',
+    color: '#FF8C00',
     fontSize: 16,
+    fontWeight: '500',
+  },
+  changeNumberContainer: {
+    marginTop: 24,
+    alignItems: 'center',
   },
   keypadToggle: {
     alignItems: 'center',

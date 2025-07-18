@@ -16,8 +16,8 @@ export const phoneStepStyles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    paddingTop: 40,
-    paddingBottom: 40,
+    paddingTop: 30,
+    paddingBottom: 0,
   },
   logo: {
     fontSize: 64,
@@ -39,7 +39,7 @@ export const phoneStepStyles = StyleSheet.create({
     justifyContent: 'center',
   },
   inputContainer: {
-    marginBottom: 16,
+    marginBottom: 20,
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',

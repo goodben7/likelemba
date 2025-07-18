@@ -10,6 +10,8 @@ type TranslationKeys = {
   'auth.login.subtitle': string;
   'auth.verification.title': string;
   'auth.verification.subtitle': string;
+  'auth.phone.page.title': string;
+  'auth.phone.page.subtitle': string;
   'auth.phone.label': string;
   'auth.phone.placeholder': string;
   'auth.otp.label': string;
@@ -46,7 +48,9 @@ const translations: Translations = {
     'auth.login.title': 'Connexion',
     'auth.login.subtitle': 'Saisissez votre numéro de téléphone pour recevoir un code de vérification',
     'auth.verification.title': 'Vérification',
-    'auth.verification.subtitle': 'Saisissez le code à 4 chiffres envoyé au {phone}',
+    'auth.verification.subtitle': 'Saisissez le code à 4 chiffres que vous avez reçu',
+    'auth.phone.page.title': 'Bienvenue',
+    'auth.phone.page.subtitle': 'Entrez votre numéro de téléphone pour commencer',
     'auth.phone.label': 'Numéro de téléphone',
     'auth.phone.placeholder': '+243 XXX XXX XXX',
     'auth.otp.label': 'Code OTP',
@@ -77,7 +81,9 @@ const translations: Translations = {
     'auth.login.title': 'Login',
     'auth.login.subtitle': 'Enter your phone number to receive a verification code',
     'auth.verification.title': 'Verification',
-    'auth.verification.subtitle': 'Enter the 4-digit code sent to {phone}',
+    'auth.verification.subtitle': 'Enter the 4-digit code you received',
+    'auth.phone.page.title': 'Welcome',
+    'auth.phone.page.subtitle': 'Enter your phone number to get started',
     'auth.phone.label': 'Phone number',
     'auth.phone.placeholder': '+243 XXX XXX XXX',
     'auth.otp.label': 'OTP Code',

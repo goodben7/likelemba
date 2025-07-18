@@ -169,7 +169,8 @@ export const AnimatedInput = forwardRef((
                 disabled: inputProps.editable === false,
                 selected: isFocused
               }}
-              {...inputProps}
+              scrollEnabled={true}
+              {...(localValue === '' ? {...inputProps, placeholder: ''} : inputProps)}
             />
           </View>
         </Animated.View>
@@ -244,7 +245,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingTop: 10,
     paddingBottom: 0,
-    height: 25,
+    height: 30,
+    flexShrink: 1,
+    flexGrow: 1,
+    flexWrap: 'wrap',
   },
   errorText: {
     color: '#DC2626',

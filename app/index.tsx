@@ -11,60 +11,7 @@ import { AnimatedInput } from '@/components/AnimatedInput';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Animatable from 'react-native-animatable';
 
-// Interface pour les props du clavier numérique personnalisé
-interface NumericKeypadProps {
-  onKeyPress: (key: string) => void;
-  onDelete: () => void;
-  onClear: () => void;
-}
 
-// Composant pour le clavier numérique personnalisé
-const NumericKeypad: React.FC<NumericKeypadProps> = ({ onKeyPress, onDelete, onClear }) => {
-  const renderKey = (value: number) => (
-    <Animatable.View 
-      animation="zoomIn" 
-      duration={600} 
-      delay={value * 50}
-      key={value}
-    >
-      <TouchableOpacity 
-        style={phoneStepStyles.keypadKey} 
-        onPress={() => onKeyPress(value.toString())}
-        accessibilityLabel={`Touche ${value}`}
-      >
-        <Text style={phoneStepStyles.keypadKeyText}>{value}</Text>
-      </TouchableOpacity>
-    </Animatable.View>
-  );
-
-  return (
-    <Animatable.View 
-      animation="fadeInUp" 
-      duration={800} 
-      delay={300}
-      style={phoneStepStyles.keypadContainer}
-    >
-      <View style={phoneStepStyles.keypadRow}>
-        {[1, 2, 3].map(renderKey)}
-      </View>
-      <View style={phoneStepStyles.keypadRow}>
-        {[4, 5, 6].map(renderKey)}
-      </View>
-      <View style={phoneStepStyles.keypadRow}>
-        {[7, 8, 9].map(renderKey)}
-      </View>
-      <View style={phoneStepStyles.keypadRow}>
-        <TouchableOpacity style={[phoneStepStyles.keypadKey, phoneStepStyles.keypadSpecialKey]} onPress={onClear}>
-          <X size={20} color="#6B7280" />
-        </TouchableOpacity>
-        {renderKey(0)}
-        <TouchableOpacity style={[phoneStepStyles.keypadKey, phoneStepStyles.keypadSpecialKey]} onPress={onDelete}>
-          <ChevronLeft size={20} color="#6B7280" />
-        </TouchableOpacity>
-      </View>
-    </Animatable.View>
-  );
-};
 
 export default function Index() {
   const {
@@ -76,7 +23,7 @@ export default function Index() {
   } = useAuth();
   const router = useRouter();
   const { t } = useTranslation();
-  const [showKeypad, setShowKeypad] = useState(false);
+
   const inputRef = useRef<any>(null);
 
   // Gérer la soumission du numéro de téléphone
@@ -94,33 +41,9 @@ export default function Index() {
     setPhone(value);
   }, [setPhone]);
   
-  // Gérer l'appui sur une touche du clavier numérique
-  const handleKeyPress = useCallback((key: string) => {
-    const newPhone = phone.length >= 12 ? phone : phone + key;
-    setPhone(newPhone);
-  }, [setPhone, phone]);
 
-  // Gérer la suppression d'un caractère
-  const handleDelete = useCallback(() => {
-    setPhone(phone.slice(0, -1));
-  }, [setPhone, phone]);
 
-  // Effacer tout le texte
-  const handleClear = useCallback(() => {
-    setPhone('');
-  }, [setPhone]);
 
-  // Basculer l'affichage du clavier numérique
-  const toggleKeypad = useCallback(() => {
-    if (showKeypad) {
-      Keyboard.dismiss();
-    } else {
-      if (inputRef.current) {
-        inputRef.current.blur();
-      }
-    }
-    setShowKeypad(prev => !prev);
-  }, [showKeypad]);
 
   return (
     <SafeAreaView style={phoneStepStyles.container}>
@@ -155,7 +78,7 @@ export default function Index() {
               style={phoneStepStyles.title} 
               accessibilityRole="header"
             >
-              {t('auth.login.title')}
+              {t('auth.phone.page.title')}
             </Animatable.Text>
             <Animatable.Text 
               animation="fadeIn" 
@@ -163,7 +86,7 @@ export default function Index() {
               delay={1000}
               style={phoneStepStyles.subtitle}
             >
-              {t('auth.login.subtitle')}
+              {t('auth.phone.page.subtitle')}
             </Animatable.Text>
           </Animatable.View>
 
@@ -180,24 +103,16 @@ export default function Index() {
                   onChangeText={handlePhoneChange}
                   placeholder={t('auth.phone.placeholder')}
                   keyboardType="phone-pad"
-                  autoFocus={!showKeypad}
+                  autoFocus={true}
                   accessibilityLabel={t('auth.phone.label')}
                   accessibilityHint={t('auth.login.subtitle')}
                   icon={<Phone size={20} color="#6B7280" />}
                   error={error}
                   ref={inputRef}
-                  onFocus={() => setShowKeypad(false)}
+
                 />
                 
-                <TouchableOpacity 
-                  style={phoneStepStyles.keypadToggle}
-                  onPress={toggleKeypad}
-                  accessibilityLabel={showKeypad ? "Masquer le clavier" : "Afficher le clavier"}
-                >
-                  <Text style={phoneStepStyles.keypadToggleText}>
-                    {showKeypad ? "Masquer le clavier" : "Utiliser le clavier numérique"}
-                  </Text>
-                </TouchableOpacity>
+
               </View>
 
               <AnimatedButton
@@ -212,13 +127,7 @@ export default function Index() {
             </Animatable.View>
           </View>
 
-          {showKeypad && (
-            <NumericKeypad 
-              onKeyPress={handleKeyPress}
-              onDelete={handleDelete}
-              onClear={handleClear}
-            />
-          )}
+
 
           <Animatable.View 
             animation="fadeIn" 
