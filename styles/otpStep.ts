@@ -20,7 +20,7 @@ export const otpStepStyles = StyleSheet.create({
     paddingBottom: 10,
   },
   logo: {
-    fontSize: 64,
+    fontSize: 80,
     marginBottom: 16,
   },
   title: {

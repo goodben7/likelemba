@@ -20,7 +20,7 @@ export const phoneStepStyles = StyleSheet.create({
     paddingBottom: 0,
   },
   logo: {
-    fontSize: 64,
+    fontSize: 80,
     marginBottom: 16,
   },
   title: {

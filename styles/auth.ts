@@ -18,7 +18,7 @@ export const authStyles = StyleSheet.create({
     paddingBottom: 40,
   },
   logo: {
-    fontSize: 64,
+    fontSize: 80,
     marginBottom: 16,
   },
   title: {
